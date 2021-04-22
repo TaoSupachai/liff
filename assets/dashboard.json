@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Leave Request",
+    "image": "https://cdn.vuetifyjs.com/images/cards/docks.jpg",
+    "uri": "https://app.hrcpcrop.com/Time/?username=",
+    "description" : "ระบบลางาน",
+    "param" : "username"
+  },
+  {
+    "title": "Profile",
+    "image": "https://cdn.vuetifyjs.com/images/cards/docks.jpg",
+    "uri": "https://kpi.cpcrop.com/get_session/",
+    "description" : "ข้อมูลพนักงาน",
+    "param" : "username"
+  }
+]
