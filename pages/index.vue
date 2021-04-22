@@ -33,7 +33,6 @@
             <div class="text-center">
               <v-btn
                 rounded
-                color="primary"
                 class="w-100 mt-8"
                 large
                 dark
@@ -116,7 +115,7 @@ export default {
               response.data.data.employee.contact.Phone_Number
             );
             this.$axios
-              .post("http://192.168.64.3/otp/otpSend.php", formData)
+              .post("https://line.cpcrop.com/api/otpSend.php", formData)
               .then((response) => {
                 // this.otpresponse = response.data.otpresponse;
                 // console.log("formData ==> ", formData);

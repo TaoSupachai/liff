@@ -11,9 +11,10 @@
     border-color: #069C54 !important;
 }
 
+
 .theme--light.v-app-bar.v-toolbar.v-sheet{
-  background-color:#069C54;
-  color :#fff
+  background-color:#069C54 !important;
+  color :#fff !important
 }
 .v-application {
     font-family: 'Prompt', sans-serif;

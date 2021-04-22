@@ -105,7 +105,7 @@ export default {
         formData.append("otpresponse", otpresponse);
         formData.append("tel", tel);
         this.$axios
-              .post("http://192.168.64.3/otp/otpVal.php", formData)
+              .post("https://line.cpcrop.com/api/otpVal.php", formData)
               .then((response) => {
                 this.$router.push("/dashboard");
               })
