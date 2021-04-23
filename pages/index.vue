@@ -35,7 +35,7 @@
                 rounded
                 class="w-100 mt-8"
                 large
-                dark
+                color="primary"
                 @click="submit"
               >
                 Login

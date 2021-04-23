@@ -36,7 +36,6 @@
                 color="primary"
                 class="w-100 mt-8"
                 large
-                dark
                 @click="submit"
               >
                 Login

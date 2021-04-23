@@ -2,3 +2,29 @@
 //
 // The variables you want to modify
 // $font-size-root: 20px;
+
+
+.v-application .primary{
+  background-color: #069C54 !important;
+    border-color: #069C54 !important;
+}
+
+
+.theme--light.v-app-bar.v-toolbar.v-sheet{
+  background-color:#069C54 !important;
+  color :#fff !important
+}
+.v-application {
+    font-family: 'Prompt', sans-serif;
+}
+.v-toolbar__title {
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+}
+.w-100{
+  width: 100%;
+}
+.display-none {
+    display: none;
+}
