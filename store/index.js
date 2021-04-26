@@ -1,38 +1,51 @@
-export const state = () =>({
-    empData : {},
-    otpresponse : null
-}) 
+export const state = () => ({
+    empData: {},
+    otpresponse: null,
+    line: null
+});
 
 export const getters = {
-    getEmpData(state){
-        return state.empData
+    getLine(state) {
+        return state.line;
+    },
+    getEmpData(state) {
+        return state.empData;
     },
 
-    getOtpresponse(state){
-        return state.otpresponse
+    getOtpresponse(state) {
+        return state.otpresponse;
     }
-}
+};
 
 export const mutations = {
-    SET_EmpData(state,data){
+    SET_LINE(state, data) {
+        state.line = {
+            ...state.line,
+            ...data
+        };
+    },
+    SET_EmpData(state, data) {
         state.empData = {
             ...state.empData,
             ...data
-        }
+        };
     },
-    SET_Otpresponse(state,data){
+    SET_Otpresponse(state, data) {
         state.otpresponse = {
             ...state.otpresponse,
             ...data
-        }
+        };
     }
-}
+};
 
 export const actions = {
-    setEmpData({commit},data){
-        commit('SET_EmpData',data)
+    setLine({ commit }, data) {
+        commit("SET_LINE", data);
     },
-    setOtpresponse({commit},data){
-        commit('SET_Otpresponse',data)
+    setEmpData({ commit }, data) {
+        commit("SET_EmpData", data);
+    },
+    setOtpresponse({ commit }, data) {
+        commit("SET_Otpresponse", data);
     }
-}
+};

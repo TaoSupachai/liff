@@ -57,6 +57,20 @@
 const REGEX_PHONE = /^[0]([0-9]{9})*$/;
 const REGEX_NUMBER = /^[0-9]*$/;
 export default {
+  mounted(){
+    liff.init({
+      liffId: '1655755694-D4Rne6oR'
+    }).then(() => {
+      if(liff.isLoggedIn()){
+        liff.getProfile().then(profile => {
+          this.$store.dispatch('setLine', profile);
+          this.isDone();
+        })
+      }else{
+        liff.login();
+      }
+    })
+  },
   data() {
     return {
       phone: "",
@@ -71,6 +85,13 @@ export default {
     };
   },
   methods: {
+    isDone(){
+      this.$axios.get(`https://cropliff-default-rtdb.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`).then((res) => {
+        if(res.data != null){
+          this.$router.push('/register/done');
+        }
+      });
+    },
     phoneValidator(value) {
       this.phoneValidated = false;
       if (value == "") {
@@ -103,6 +124,7 @@ export default {
             // do something about response
             this.$store.dispatch("setEmpData", response.data.data);
 
+
             this.dialog = true;
             this.dialogMsg = "ระบบได้ทำการส่งรหัส OTP ไปยังโทรศัพท์ของท่านแล้ว";
 
@@ -125,7 +147,7 @@ export default {
                   otpresponse: response.data.otpresponse,
                   tel: this.phone,
                 });
-                this.$router.push("/otp");
+                this.$router.push("/register/otpstep");
               })
               .catch((error) => {
                 console.log("error otpSend ==> ", error);
@@ -139,12 +161,6 @@ export default {
             this.dialogMsg = "Username หรือ Password ไม่ถูกต้อง";
           });
       }
-    },
-    handleOnComplete(value) {
-      console.log("OTP completed: ", value);
-    },
-    handleOnChange(value) {
-      console.log("OTP changed: ", value);
     },
     handleClearInput() {
       this.$refs.otpInput.clearInput();
