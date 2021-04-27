@@ -59,7 +59,7 @@ const REGEX_NUMBER = /^[0-9]*$/;
 export default {
   mounted(){
     liff.init({
-      liffId: '1655755694-D4Rne6oR'
+      liffId: '1655755694-EJPdZr1P'
     }).then(() => {
       if(liff.isLoggedIn()){
         liff.getProfile().then(profile => {
@@ -85,12 +85,16 @@ export default {
     };
   },
   methods: {
-    isDone(){
-      this.$axios.get(`https://cropliff-default-rtdb.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`).then((res) => {
-        if(res.data != null){
-          this.$router.push('/register/done');
-        }
-      });
+    isDone() {
+      this.$axios
+        .get(
+          `https://cropliff-default-rtdb.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`
+        )
+        .then((res) => {
+          if (res.data != null) {
+            this.$router.push("/register/done");
+          }
+        });
     },
     phoneValidator(value) {
       this.phoneValidated = false;
@@ -121,28 +125,15 @@ export default {
         this.$axios
           .post(`https://line.cpcrop.com/api/fetchEmp.php`, Data)
           .then((response) => {
-            // do something about response
-            this.$store.dispatch("setEmpData", response.data.data);
+            if (response.data.status) {
+              this.$store.dispatch("setEmpData", response.data.data);
 
+              this.dialog = true;
+              this.dialogMsg = "ระบบได้ทำการส่งรหัส OTP ไปยังโทรศัพท์ของท่านแล้ว";
 
-            this.dialog = true;
-            this.dialogMsg = "ระบบได้ทำการส่งรหัส OTP ไปยังโทรศัพท์ของท่านแล้ว";
-
-            // //sentotp
-            // //this.$axios.post('~/assets/otp/otpSend.php', {tel:'0641979362'}).then((response) => {
-            // this.tel = response.data.data.employee.contact.Phone_Number;
-
-            // const formData = new FormData();
-            // formData.append(
-            //   "tel",
-            //   response.data.data.employee.contact.Phone_Number
-            // );
-            this.$axios
+              this.$axios
               .post("https://line.cpcrop.com/api/otpSend.php", Data)
               .then((response) => {
-                // this.otpresponse = response.data.otpresponse;
-                // console.log("formData ==> ", formData);
-                // console.log("otpresponse: ", response.data);
                 this.$store.dispatch("setOtpresponse", {
                   otpresponse: response.data.otpresponse,
                   tel: this.phone,
@@ -152,26 +143,23 @@ export default {
               .catch((error) => {
                 console.log("error otpSend ==> ", error);
                 this.dialog = true;
-                this.dialogMsg = "ผิดพลาด";
+                this.dialogMsg = "ไม่สามารถส่ง OTP ได้";
               });
+            } else {
+              this.dialog = true;
+              this.dialogMsg = response.data.data;
+            }            
           })
           .catch((err) => {
             console.error(err);
             this.dialog = true;
-            this.dialogMsg = "Username หรือ Password ไม่ถูกต้อง";
+            this.dialogMsg = "API ตรวจสอบ Phonenumber ผิดพลาด";
           });
       }
     },
     handleClearInput() {
       this.$refs.otpInput.clearInput();
     },
-    // clear() {
-    //   this.$v.$reset();
-    //   this.name = "";
-    //   this.email = "";
-    //   this.select = null;
-    //   this.checkbox = false;
-    // },
   },
 };
 </script>

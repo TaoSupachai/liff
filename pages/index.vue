@@ -3,60 +3,29 @@
     <v-app-bar flat>
       <v-toolbar-title>Login</v-toolbar-title>
     </v-app-bar>
-    <v-container>
-      <v-row justify="center" align="center">
-        <v-col cols="12" sm="8" md="6">
-          <div class="text-center my-5">
-            <img src="~/assets/logo.png" alt="" width="200px" />
-          </div>
-        </v-col>
-      </v-row>
-      <v-row justify="center" align="center">
-        <v-col cols="12" sm="8" md="6">
-          <form autocomplete="off">
-            <v-text-field
-              v-model="phone"
-              outlined
-              dense
-              :rules="phoneRules"
-              @keypress="onlyNumber($event, 10)"
-              label="Phone"
-            ></v-text-field>
-            <div class="text-center">
-              <v-btn
-                rounded
-                class="w-100 mt-8"
-                large
-                color="primary"
-                @click="submit"
-              >
-                Login
-              </v-btn>
-              <!-- <v-btn @click="clear"> clear </v-btn> -->
-            </div>
-          </form>
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-dialog v-model="dialog" persistent max-width="290">
-      <v-card>
-        <v-card-title></v-card-title>
-        <v-card-text v-html="dialogMsg"></v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="dialog = false">
-            Ok
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <v-container> </v-container>
   </div>
 </template>
 
 <script>
 const REGEX_PHONE = /^[0]([0-9]{9})*$/;
 const REGEX_NUMBER = /^[0-9]*$/;
-export default {
+export default {  
+  mounted() {
+    liff.init({
+      liffId: "1655755694-EJPdZr1P",
+    });
+    liff.ready.then(() => {
+      if (liff.isLoggedIn()) {
+        liff.getProfile().then((profile) => {
+          this.$store.dispatch("setLine", profile);
+          this.isDone();
+        });
+      } else {
+        liff.login();
+      }
+    });
+  },
   data() {
     return {
       phone: "",
@@ -68,9 +37,58 @@ export default {
       dialogMsg: "",
       phoneValidated: false,
       phoneRules: [(value) => this.phoneValidator(value)],
+      app: null,
+      qparam: null,
     };
   },
   methods: {
+    isDone() {
+      this.app = this.$route.query.app;
+      this.$axios
+        .get(
+          `https://cropliff-default-rtdb.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`
+        )
+        .then((res) => {
+          if (res.data != null) {
+            this.app = this.$route.query.app;
+            this.$store.dispatch("setEmpData", res.data);
+            this.openApp();
+          } else {
+            this.$router.push("/register");
+          }
+        });
+    },
+    openApp() {
+      this.$axios
+        .get(
+          `https://cropliff-default-rtdb.firebaseio.com/dashboards/${this.app}.json`
+        )
+        .then((res) => {
+          if (res.data != null) {
+            switch (res.data.param) {
+              case "username":
+                this.qparam = this.$store.getters.getEmpData.Username;
+                break;
+              case "usernameBase64":
+                this.qparam = btoa(this.$store.getters.getEmpData.Username);
+                break;
+              case "iden":
+                this.qparam = this.$store.getters.getEmpData.Identification_no;
+                break;
+              case "idenBase64":
+                this.qparam = btoa(
+                  this.$store.getters.getEmpData.Identification_no
+                );
+                break;
+            }
+            const uri = `${res.data.uri}${this.qparam}`;
+            window.location.replace(uri);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
     phoneValidator(value) {
       this.phoneValidated = false;
       if (value == "") {
@@ -93,69 +111,6 @@ export default {
         }
       }
     },
-    submit() {
-      if (this.phoneValidated) {
-        const Data = new FormData();
-        Data.append("tel", this.phone);
-        this.$axios
-          .post(`https://line.cpcrop.com/api/fetchEmp.php`, Data)
-          .then((response) => {
-            // do something about response
-            this.$store.dispatch("setEmpData", response.data.data);
-
-            this.dialog = true;
-            this.dialogMsg = "ระบบได้ทำการส่งรหัส OTP ไปยังโทรศัพท์ของท่านแล้ว";
-
-            // //sentotp
-            // //this.$axios.post('~/assets/otp/otpSend.php', {tel:'0641979362'}).then((response) => {
-            // this.tel = response.data.data.employee.contact.Phone_Number;
-
-            // const formData = new FormData();
-            // formData.append(
-            //   "tel",
-            //   response.data.data.employee.contact.Phone_Number
-            // );
-            this.$axios
-              .post("https://line.cpcrop.com/api/otpSend.php", Data)
-              .then((response) => {
-                // this.otpresponse = response.data.otpresponse;
-                // console.log("formData ==> ", formData);
-                // console.log("otpresponse: ", response.data);
-                this.$store.dispatch("setOtpresponse", {
-                  otpresponse: response.data.otpresponse,
-                  tel: this.phone,
-                });
-                this.$router.push("/otp");
-              })
-              .catch((error) => {
-                console.log("error otpSend ==> ", error);
-                this.dialog = true;
-                this.dialogMsg = "ผิดพลาด";
-              });
-          })
-          .catch((err) => {
-            console.error(err);
-            this.dialog = true;
-            this.dialogMsg = "Username หรือ Password ไม่ถูกต้อง";
-          });
-      }
-    },
-    handleOnComplete(value) {
-      console.log("OTP completed: ", value);
-    },
-    handleOnChange(value) {
-      console.log("OTP changed: ", value);
-    },
-    handleClearInput() {
-      this.$refs.otpInput.clearInput();
-    },
-    // clear() {
-    //   this.$v.$reset();
-    //   this.name = "";
-    //   this.email = "";
-    //   this.select = null;
-    //   this.checkbox = false;
-    // },
   },
 };
 </script>
